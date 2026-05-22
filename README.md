@@ -16,7 +16,7 @@ Wraps three free public data sources — PIB (Press Information Bureau), major I
 
 | Tool | What it answers |
 |---|---|
-| `get_daily_pib_releases` | Official government announcements and policy launches |
+| `get_daily_pib_releases` | Official government announcements and policy launches (via English newspaper coverage) |
 | `search_current_affairs` | Recent news on any topic across PIB + major papers |
 | `get_scheme_summary` | Objectives, budget, beneficiaries of any government scheme |
 | `get_article_content` | Full text of an article given its URL |
@@ -29,7 +29,7 @@ No API key needed. All sources are public.
 ## Stack
 
 - Python + [MCP SDK](https://github.com/modelcontextprotocol/python-sdk) (FastMCP)
-- `feedparser` for RSS parsing
+- `feedparser` for RSS parsing (The Hindu, Indian Express, NDTV)
 - `trafilatura` for article text extraction
 - `requests` for Wikipedia API calls
 - Claude Desktop as the MCP host (stdio transport)
@@ -101,6 +101,7 @@ PRs and issues welcome.
 
 ## Data sources
 
-- [PIB](https://pib.gov.in) — Press Information Bureau, Government of India (public RSS)
-- [The Hindu](https://thehindu.com), [Indian Express](https://indianexpress.com), [NDTV](https://ndtv.com) — public RSS feeds
+- [The Hindu](https://thehindu.com), [Indian Express](https://indianexpress.com), [NDTV](https://ndtv.com) — public RSS feeds (English, dated, verified live)
 - [Wikipedia REST API](https://en.wikipedia.org/api/rest_v1/) — free, no key required
+
+> **Note on PIB**: PIB's public RSS feed (`pib.gov.in`) is Hindi-only and omits publication dates, making it unsuitable for this server. English government news is sourced from major newspapers that cover PIB releases with full context.

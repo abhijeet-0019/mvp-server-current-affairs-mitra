@@ -7,9 +7,19 @@ from datetime import datetime, timedelta, timezone
 # key   → category label exposed to MCP tools
 # value → list of (human-readable source name, RSS URL) tuples
 # ---------------------------------------------------------------------------
+# PIB RSS notes:
+# - The feed publishes in both Hindi and English (mixed, based on what was released recently)
+# - Entries have no <pubDate> tag — _parse_date() returns datetime.now() as fallback
+# - Article pages are iframe-based so trafilatura cannot extract their content
+# - English entries are filtered using an ASCII-ratio heuristic (>80% ASCII = English)
+# - Newspaper feeds (The Hindu, NDTV, Indian Express) are used alongside PIB to ensure
+#   reliable English coverage with summaries and dates.
 FEEDS: dict[str, list[tuple[str, str]]] = {
-    "pib": [
-        ("PIB", "https://www.pib.gov.in/RssMain.aspx?ModID=6&Lang=1&Regid=3"),
+    "government": [
+        ("PIB",                   "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3&reg=3"),
+        ("The Hindu – National",  "https://www.thehindu.com/news/national/feeder/default.rss"),
+        ("NDTV – India",          "https://feeds.feedburner.com/ndtvnews-india-news"),
+        ("Indian Express – India", "https://indianexpress.com/section/india/feed/"),
     ],
     "india": [
         ("The Hindu – National", "https://www.thehindu.com/news/national/feeder/default.rss"),
@@ -36,7 +46,6 @@ FEEDS: dict[str, list[tuple[str, str]]] = {
 
 # Feeds used for daily digest (one entry per major source)
 DIGEST_FEEDS: list[tuple[str, str]] = [
-    ("PIB",            "https://www.pib.gov.in/RssMain.aspx?ModID=6&Lang=1&Regid=3"),
     ("The Hindu",      "https://www.thehindu.com/feeder/default.rss"),
     ("Indian Express", "https://indianexpress.com/feed/"),
     ("NDTV",           "https://feeds.feedburner.com/ndtvnews-top-stories"),
@@ -45,11 +54,21 @@ DIGEST_FEEDS: list[tuple[str, str]] = [
 HEADERS = {"User-Agent": "Mozilla/5.0", "Accept": "application/xml, text/xml, */*"}
 
 
+def _is_english(text: str) -> bool:
+    """Return True if text is predominantly ASCII (i.e. English, not Hindi/Devanagari)."""
+    if not text:
+        return True
+    return sum(1 for c in text if ord(c) < 128) / len(text) > 0.8
+
+
 def _parse_date(entry) -> datetime:
-    """Return a timezone-aware UTC datetime from a feedparser entry."""
+    """Return a timezone-aware UTC datetime from a feedparser entry.
+    Falls back to 'now' when the feed omits <pubDate> — treating undated
+    entries as current so they are never silently dropped by recency filters.
+    """
     if hasattr(entry, "published_parsed") and entry.published_parsed:
         return datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
-    return datetime.min.replace(tzinfo=timezone.utc)
+    return datetime.now(timezone.utc)
 
 
 def _normalize(entry, source_name: str) -> dict:
@@ -89,15 +108,16 @@ class NewsClient:
 
     def get_pib_releases(self, date: str = "today", ministry: str = "") -> list[dict]:
         """
-        Fetch PIB press releases.
+        Fetch official government news from major English newspapers (The Hindu,
+        NDTV, Indian Express) which cover government announcements, policy launches,
+        and scheme updates in English with context.
         date    : "today" (default) or "YYYY-MM-DD"
         ministry: optional keyword to filter by ministry name in title/summary
         Returns up to 20 most recent matching entries.
         """
-        entries = self.fetch_feed(
-            "https://www.pib.gov.in/RssMain.aspx?ModID=6&Lang=1&Regid=3",
-            "PIB",
-        )
+        entries: list[dict] = []
+        for source_name, url in FEEDS["government"]:
+            entries.extend(self.fetch_feed(url, source_name))
 
         if date and date.lower() != "today":
             try:

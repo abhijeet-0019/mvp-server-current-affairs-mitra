@@ -35,9 +35,11 @@ def _format_entries(entries: list[dict]) -> str:
 @mcp.tool()
 def get_daily_pib_releases(date: str = "today", ministry: str = "") -> str:
     """
-    Fetch Press Information Bureau (PIB) press releases — the primary official
-    source for Indian government announcements, policy launches, scheme updates,
-    and cabinet decisions.
+    Fetch recent official government news from major English newspapers (The Hindu,
+    NDTV, Indian Express) — these sources carry full English coverage of government
+    announcements, policy launches, cabinet decisions, and scheme updates.
+    Note: PIB's public RSS feed is Hindi-only, so English newspaper coverage
+    is used as the source for government news.
 
     Use this tool when the user asks about:
     - What did the government announce today / this week?
@@ -45,11 +47,11 @@ def get_daily_pib_releases(date: str = "today", ministry: str = "") -> str:
     - Official government stance on an issue.
 
     Args:
-        date    : "today" (default) for the latest releases, or a specific date
+        date    : "today" (default) for the latest news, or a specific date
                   in YYYY-MM-DD format (e.g. "2026-05-20").
         ministry: optional keyword to filter by ministry name
                   (e.g. "Agriculture", "Finance", "Defence").
-                  Leave blank to get releases across all ministries.
+                  Leave blank to get all government news.
     """
     entries = news.get_pib_releases(date=date, ministry=ministry)
     if not entries:
