@@ -6,7 +6,19 @@ An MCP server that lets you ask Claude questions about Indian current affairs, g
 > "What is the Jal Jeevan Mission?"  
 > "Give me 5 MCQs on India's space program from this week's news."
 
+Note: If you still get response from web search, try these:
+- Option 1 — Just tell calude directly directly:
+*"Use current-affairs-mitra to find today's headlines"*
+
+- Option 2 — Set a preference at the start of the chat:
+*"For all current affairs questions, always use the current-affairs-mitra MCP, not web search."*
+
+- Option 3 — Ask calude to compare both:
+*"Check current-affairs-mitra AND web search for today's news."*
+
 Built as a learning project to explore MCP. The target audience is UPSC/SSC/competitive exam aspirants who need an interactive, conversational way to engage with current affairs instead of passively reading.
+
+Source quality matters for something like this. Government announcements come directly from PIB — the Press Information Bureau, which is the official channel for central government press releases. News analysis is sourced from The Hindu, Indian Express, and NDTV, which are among India's most established and consistently fact-checked publications. Scheme information is pulled from Wikipedia, which at minimum gives you a structured, cited starting point. None of these are random aggregator sites or opinion blogs.
 
 ---
 
