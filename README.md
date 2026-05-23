@@ -113,7 +113,8 @@ PRs and issues welcome.
 
 ## Data sources
 
+- [PIB](https://pib.gov.in) — Press Information Bureau, Government of India (public RSS, English feed)
 - [The Hindu](https://thehindu.com), [Indian Express](https://indianexpress.com), [NDTV](https://ndtv.com) — public RSS feeds (English, dated, verified live)
 - [Wikipedia REST API](https://en.wikipedia.org/api/rest_v1/) — free, no key required
 
-> **Note on PIB**: PIB's public RSS feed (`pib.gov.in`) is Hindi-only and omits publication dates, making it unsuitable for this server. English government news is sourced from major newspapers that cover PIB releases with full context.
+This server fetches content on-demand for personal use only. No content is stored or redistributed. Redistribution of article text may be subject to the respective publishers' copyright terms.
